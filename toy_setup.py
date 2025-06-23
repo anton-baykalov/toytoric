@@ -19,7 +19,9 @@ import math
 import torch
 from torch import nn
 
-"""CPU or GPU"""
+# %% """CPU or GPU"""
+
+
 
 if torch.cuda.is_available():
     Dvc = torch.device("cuda:0")
@@ -30,7 +32,7 @@ else:
 
 CpuDvc = torch.device("cpu")
 
-"""# Helpful functions on polynomials"""
+# %% """# Helpful functions on polynomials"""
 
 # functions I use to perform 'tricks' on lists of pairs of polynomials
 
@@ -192,7 +194,7 @@ def get_monomial_from_index(i, n, d, variables):
 
     return monomial
 
-# Examples
+# %% Examples
 
 r = 6
 n = r*(r+1)//2
@@ -205,16 +207,12 @@ for sym in gens:
 
 get_monomial_from_index(9, n, 4, gens)
 
-"""# Random polynomials
+# %%  Random polynomials
 
-Below are the functions to generate random monomials and random polynomials on given set of variables. Both eaither over $\mathbb{Z}$ or $\mathbb{F}_{32003}.$ If `coefficient_ring` is `None`, then monomials and polynomials are generated over $\mathbb{Z}$ with all coefficients set to 1. Monomials have given degree, polynomials age defined to be of degree at most the one that is given as a parameter.
+#Below are the functions to generate random monomials and random polynomials 
+#on given set of variables. Both eaither over $\mathbb{Z}$ or $\mathbb{F}_{32003}.$ If `coefficient_ring` is `None`, then monomials and polynomials are generated over $\mathbb{Z}$ with all coefficients set to 1. Monomials have given degree, polynomials age defined to be of degree at most the one that is given as a parameter.
 
 
-
-
-"""
-
-#R, gens = sp.xring('x:' + str(n), coefficient_ring)
 def random_mon(var, deg, coefficient_ring=sp.FF(32003),coefficient_range=None):
   """
     Generates a random monomial of a given degree using SymPy.
@@ -291,20 +289,20 @@ def random_poly(variables, max_degree, num_terms, coefficient_ring=sp.FF(32003),
     # Sum the generated terms
     return sum(polynomial_terms)
 
-"""## Examples of the use of above functions"""
+# %%"""## Examples of the use of above functions"""
 
 #Examples
-r = 6
-n = r*(r+1)//2
-#R, gens = sp.xring('x:' + str(n), sp.FF(32003))
-gens = list(sp.symbols('x0:{}'.format(n)))
-print(gens)
-print(random_mon(gens, 4, None))
-print(random_poly(gens, 5, 7 , None))
+#r = 6
+#n = r*(r+1)//2
 
-"""# ToyToric class and random_cc
+#gens = list(sp.symbols('x0:{}'.format(n)))
+#print(gens)
+#print(random_mon(gens, 4, None))
+#print(random_poly(gens, 5, 7 , None))
 
-The class ToyToric holds an integrand and cone conditions.
+# %% """# ToyToric class and random_cc
+
+"""The class ToyToric holds an integrand and cone conditions.
 Methods `not_free_variables()` and `free_variables()` return what they say they do.
 
 Method `get_data_for_NN` incodes cone conditions into np array of integers. If `no_coef` is `True`, then coefficients are omited.
@@ -591,43 +589,9 @@ def random_cc(r,m, s, d, coefficient_ring=sp.FF(32003),coefficient_range=None, i
     variables=gens
     )
 
-cc614symbols = [(x18*x20, x9*x18 - x7*x19),
- (x15*x18, x12*x15 - x11*x16),
- (x11*x15, x7*x11 - x6*x12),
- (x11*x15, x2*x11 - x1*x12),
- (x15*x18*x20, x11*x17*x18 + x12*x15*x19 - x11*x16*x19),
- (x15*x18*x20, x3*x15*x18 - x0*x17*x18 + x0*x16*x19),
- (x11*x15*x18, x8*x11*x15 - x6*x13*x15 - x7*x11*x16 + x6*x12*x16),
- (x11*x15*x18, x3*x11*x15 - x1*x13*x15 - x2*x11*x16 + x1*x12*x16),
- (x11*x15*x18, x2*x11*x15 + x0*x13*x15 - x0*x12*x16),
- (x11*x15*x18*x20,
-  x6*x14*x15*x18 + x7*x11*x17*x18 - x6*x12*x17*x18 + x8*x11*x15*x19 - x6*x13*x15*x19 - x7*x11*x16*x19 + x6*x12*x16*x19),
- (x11*x15*x18*x20,
-  x1*x14*x15*x18 + x2*x11*x17*x18 - x1*x12*x17*x18 + x3*x11*x15*x19 - x1*x13*x15*x19 - x2*x11*x16*x19 + x1*x12*x16*x19),
- (x11*x15*x18*x20,
-  x4*x11*x15*x18 + x0*x14*x15*x18 - x0*x12*x17*x18 - x2*x11*x15*x19 - x0*x13*x15*x19 + x0*x12*x16*x19),
- (x20, x18),
- (x20, x16),
- (x18, x15),
- (x18*x20, x15*x19),
- (x20, x13),
- (x20, x12),
- (x15, x11),
- (x20, x8),
- (x18, x7),
- (x11, x6),
- (x20, x2),
- (x11, x1),
- (x11, x0),
- (x11*x15, x0*x12),
- (x15*x18, x0*x16)]
 
-cc614 = [(sp.Poly(p1, *gens, domain =sp.ZZ), sp.Poly(p2, *gens, domain=sp.ZZ) ) for p1, p2 in cc614symbols]
-#cc614
-#sp.Poly(cc614symbols[0][0], *gens, domain =sp.ZZ)
-#type(cc614symbols[0][0])
-
-#Examples
+# %% Examples
+"""
 r = 5
 n = r*(r+1)//2
 #R, gens = sp.xring('x:' + str(n), sp.FF(32003))
@@ -665,12 +629,10 @@ toyt.get_data_torch(7,10, False)[1]
 #type(toyt.cone_conditions[0][0]) #.as_expr()
 #type(random_cc(6,6, 6, 4, None).cone_conditions[0][0])
 
-"""# Blowup  and change of variables on ToyToric
-
-
-Should this be methods of ToyToric class?
-
 """
+
+# %% Blowup  and change of variables on ToyToric
+
 
 def trick_blowup_tt(TT, var1, var2):
     """
@@ -709,11 +671,7 @@ def trick_blowup_tt(TT, var1, var2):
     integ2[0][ind_dic[var1]] = integ2[0][ind_dic[var1]] + integ2[0][ind_dic[var2]]
     integ2[1][ind_dic[var1]] = integ2[1][ind_dic[var1]] + integ2[1][ind_dic[var2]]
 
-    #polyh1 = Td.polyhedron
-    #polyh2 = Td.polyhedron
-
-    #print("Debugging tcc0:", tcc0)
-    #print("Debugging tcc1:", tcc1)
+    
     return [ToyToric( integ1, tcc0, TT.ring, TT.variables), ToyToric( integ2, tcc1, TT.ring, TT.variables)]
 
 
@@ -760,7 +718,7 @@ def trick_changevar_reduce(TT):
                     # Ensure t_over_x is not zero to avoid division by zero
                     if t_over_x != 0:
                         # Use sp.div for polynomial division
-                        t_poly = sp.Poly(t, *TT.variables, domain=TT.ring if TT.ring else sp.ZZ)
+                        #t_poly = sp.Poly(t, *TT.variables, domain=TT.ring if TT.ring else sp.ZZ)
                         t_over_x_poly = sp.Poly(t_over_x, *TT.variables, domain=TT.ring if TT.ring else sp.ZZ)
                         f_min_t_terms = [term for term in f.as_expr().as_ordered_terms() if term != t]
                         #print(f_min_t_terms)
@@ -790,13 +748,13 @@ def trick_changevar_reduce(TT):
 
     return TT, False, None # Return the original state if no beneficial change is found
 
-#Examples
+# %% Examples
 
-print(toyt)
-print(toyt.free_variables())
+#print(toyt)
+#print(toyt.free_variables())
 
 
-btoyt = trick_blowup_tt(toyt, gens[0], gens[12])
+#btoyt = trick_blowup_tt(toyt, gens[0], gens[12])
 #print(btoyt)
 #print(btoyt[0])
 #print(btoyt[1])
@@ -812,32 +770,25 @@ btoyt = trick_blowup_tt(toyt, gens[0], gens[12])
 
 
 
-nTT, is_new, ch = trick_changevar_reduce(btoyt[0])
-print(is_new)
-print(ch)
-print(nTT)
-
-nTT.reduce()
-print(nTT)
-
-print(nTT.cone_conditions[0][0])
-print(nTT.cone_conditions[0][1])
-g = nTT.cone_conditions[0][0]
-f = nTT.cone_conditions[0][1]
-
-divisible_t = []
-for t in f.as_expr().as_ordered_terms():
-    t_poly = sp.Poly(t, *nTT.variables, domain=nTT.ring if nTT.ring else sp.ZZ)
-    if sp.rem(t_poly, g) == 0:
-        divisible_t.append(t_poly)
-sum_t = sum(divisible_t)
-print(sum_t)
+#nTT, is_new, ch = trick_changevar_reduce(btoyt[0])
+#print(is_new)
+#print(ch)
+#print(nTT)
 
 #nTT.reduce()
 #print(nTT)
 
-"""# State of the game and moves
+#print(nTT.cone_conditions[0][0])
+#print(nTT.cone_conditions[0][1])
+#g = nTT.cone_conditions[0][0]
+#f = nTT.cone_conditions[0][1]
 
+
+#nTT.reduce()
+#print(nTT)
+
+# %% State of the game and moves
+"""
 State of the game is a list of ToyToric instances. On a turn we can do:
 1. `blowup()` a blow-up on one of the instances (this addas and extra instance to the state)
 2. `change_var()`  a  change of basis in one of the instances
@@ -887,9 +838,6 @@ Second option of incoded move consists of:
 Firs model decised type of a move
 Second decides a blowup
 Third decides  a change of variables  
-
-
-
 """
 
 class ToyState:
@@ -1091,7 +1039,8 @@ class ToyState:
         else:
           return False # just in case, should never happen
 
-#Example of returning data
+# %%Example of returning data
+"""
 N = 1
 d = 2
 max_degree = 6
@@ -1108,19 +1057,8 @@ S.auto_change_var()
 print(S)
 print(S.weight())
 
-"""# Usage of moves: examples
-
-
-
-## Problem
-
-If do not give the **agent** info about coefficients (see `get_data_for_NN` method for ToyToric), then it has no way to know what coefficient to give during change of variables.
-
-Possible solutions:
-1. If coefficients are in $\mathbb{Z},$ then when performing change of variables I can code it to try $+1$ and $-1$ and use the one that is "better" according to the reight/reward function (gives shorter polinomial with slammer coefficients).
-2. Keep track of the coefficients in `get_data_for_NN`.
-
-so far I added option to track the coefficients
+# %% Usage of moves: examples
+"""
 
 """
 
@@ -1157,544 +1095,4 @@ len(S.torics[0].cone_conditions)
 
 #S.get_data_torch(6,6, False)
 
-"""# NN Agents and reinforcement
-
-The plan is to have to agents for two ways to encode moves.
-
-To do:
-
-1. Make the agent that plays games.
-2. Play a bunch of games and score them.
-3. Choose top (10% for example games)
-4. Reinforce actions in those games.
-
-
-### In the cell below:
-
-Constructor for an NN that takes in (state, turn) where state is output of `ToyState.code_for_torch` and move is seqwence of zeroes and one 1 of the place with the index = number of the turn. Returns a tensor of shape (1, M_length) which can be softmaxed and then converted to input for `code_to_move1`.
-
-
-
 """
-
-r= 5
-n = r*(r+1)//2
-num_of_cond = 7
-max_terms = 16
-max_degree =6 # not needed for imput of the agent (state.data_for_torch())
-change_max_degree = 3 # maximum degree of a change of variables
-N = 8 # max lenght of state (number of ToyTorics is it)
-
-num_of_coef =2 #if over Z, only +- 1
-#num_of_coef = 32002 # if over finite field
-
-#  length of a torch tensor incoding a state (first input of agent)
-S_length = N*(num_of_cond*(n+(n+1)*max_terms)) # if no_coef is False
-#S_length = N*(num_of_cond*(n+(n)*max_terms)) # if no_coef is True
-
-n_turns =10 # number of turns we want to play (second imput of agent)
-
-# length of a torch tensor incoding a move (output of agent)
-M_length = 1+N*(math.comb(n,2)+n*num_of_coef*(math.comb(n+change_max_degree,change_max_degree)-1))
-
-
-# Defining the initial state for Fil4 -- ideals
-r = 5
-n = r*(r+1)//2
-gens = list(sp.symbols('x0:{}'.format(n)))
-integr = random_cc(5,6, 6, 4, None).integrand
-toytfil4 = ToyToric(integr, ccfil4, None, gens)
-S = ToyState(toytfil4,N) #Starting state
-
-class FCModel(nn.Module):
-    def __init__(self, layer_dims):
-        super().__init__()
-
-        # Deal with the state and one-hot move vectors separately, since we can do this efficiently.
-        self.first_state = nn.Linear(S_length, layer_dims[0])
-        self.first_move = nn.Linear(n_turns, layer_dims[0], bias=False)
-
-        self.layers = nn.ModuleList([
-            nn.Linear(a, b)
-            for a, b in zip(layer_dims, layer_dims[1:])
-        ])
-
-        self.fully_conn = nn.Linear(layer_dims[-1], M_length)
-
-    def forward(self, state, move):
-        x = self.first_state(state) + self.first_move(move)
-        x = nn.functional.relu(x)
-
-        for linear in self.layers:
-            x = linear(x)
-            x = nn.functional.relu(x)
-
-        x = self.fully_conn(x)
-        x = torch.softmax(x, dim=1)
-        return x
-
-
-x = torch.ones((1, S_length))      # Shape (1, S_length): the first index is the batch number.
-y = torch.ones((1, n_turns)) # Shape (1, n_turns): the first index is the batch number.
-out=FCModel([10, 10])(x, y)  # Test that we get back something of shape (1, 1).
-out.softmax(dim=1)
-max_index = torch.argmax(out)
-print("Index of max value:", max_index)
-
-one_hot_tensor_direct = torch.nn.functional.one_hot(max_index.unsqueeze(0), num_classes=M_length).float()
-one_hot_tensor_direct
-torch.sum(one_hot_tensor_direct)
-
-print("Input lenght S_length", S_length)
-print("Output lenght M_length", M_length)
-
-"""# Models for games with blowups only
-
-1. Here we do not need to incode coefficients into data for the model.
-
-2. The output move is $1+ \binom{n}{2}$ buckets: do nothing + blowups.
-
-
-"""
-
-r= 5
-n = r*(r+1)//2
-num_of_cond = 7
-max_terms = 16
-max_degree =6 # not needed for imput of the agent (state.data_for_torch())
-#change_max_degree = 2 # maximum degree of a change of variables
-N = 8 # max lenght of state (number of ToyTorics is it)
-
-#num_of_coef =2 #if over Z, only +- 1
-#num_of_coef = 32002 # if over finite field
-
-#  length of a torch tensor incoding a state (first input of agent)
-#S_length = N*(num_of_cond*(n+(n+1)*max_terms)) # if no_coef is False
-S_length = N*(num_of_cond*(n+(n)*max_terms)) # if no_coef is True
-
-n_turns =10 # number of turns we want to play (second imput of agent)
-
-# length of a torch tensor incoding a move (output of agent)
-M_length = 1+N*(math.comb(n,2))
-
-
-# Defining the initial state for Fil4 -- ideals
-r = 5
-n = r*(r+1)//2
-gens = list(sp.symbols('x0:{}'.format(n)))
-integr = random_cc(5,6, 6, 4, None).integrand
-toytfil4 = ToyToric(integr, ccfil4, None, gens)
-S = ToyState(toytfil4,N) #Starting state
-
-class ModelBU(nn.Module):
-    def __init__(self, layer_dims):
-        super().__init__()
-
-        # Deal with the state and one-hot move vectors separately, since we can do this efficiently.
-        self.first_state = nn.Linear(S_length, layer_dims[0])
-        self.first_move = nn.Linear(n_turns, layer_dims[0], bias=False)
-
-        self.layers = nn.ModuleList([
-            nn.Linear(a, b)
-            for a, b in zip(layer_dims, layer_dims[1:])
-        ])
-
-        self.fully_conn = nn.Linear(layer_dims[-1], M_length)
-
-    def forward(self, state, move):
-        x = self.first_state(state) + self.first_move(move)
-        x = nn.functional.relu(x)
-
-        for linear in self.layers:
-            x = linear(x)
-            x = nn.functional.relu(x)
-
-        x = self.fully_conn(x)
-        x = torch.softmax(x, dim=1)
-        return x
-
-
-x = torch.ones((1, S_length))      # Shape (1, S_length): the first index is the batch number.
-y = torch.ones((1, n_turns)) # Shape (1, n_turns): the first index is the batch number.
-out=FCModel([10, 10])(x, y)  # Test that we get back something of shape (1, 1).
-out.softmax(dim=1)
-max_index = torch.argmax(out)
-print("Index of max value:", max_index)
-
-one_hot_tensor_direct = torch.nn.functional.one_hot(max_index.unsqueeze(0), num_classes=M_length).float()
-one_hot_tensor_direct
-torch.sum(one_hot_tensor_direct)
-
-print("Input lenght S_length", S_length)
-print("Output lenght M_length", M_length)
-
-"""# Playing games"""
-
-# to play games with an agent
-def play_games(agent, k_games, start_state, num_of_cond, max_terms, no_coef, N, change_max_degree, max_degree):
-    """
-    Play k_games starting at start_state, using the agent to give probability distributions on each move.
-    """
-    #bunch_of_states = [copy.deepcopy(start_state) for _ in range(k_games)] # Create k_games copies of the start_state
-    # Create a numpy array of k_games copies of the start_state
-    bunch_of_states = np.empty(k_games, dtype=object)
-    for i in range(k_games):
-        bunch_of_states[i] = copy.deepcopy(start_state)
-
-    stateid=(start_state.get_data_torch(num_of_cond ,max_terms, no_coef)).repeat(k_games,1)
-    moveid = torch.eye(n_turns)
-
-    actions_record = np.zeros((k_games, n_turns, M_length))
-    stateid_record = np.zeros((k_games, n_turns, S_length))
-
-    for step in range(n_turns):
-        #print("Turn:", step)
-        with torch.no_grad():
-            # Agent outputs probabilities/scores for each move for the batch of states
-            move_output = agent(stateid, moveid[step].unsqueeze(0).repeat(k_games, 1)) # Shape (k_games, M_length)
-
-        # Determine the chosen move for each game in the batch
-        # We take the argmax along the M_length dimension (dimension 1)
-        #chosen_moves_indices = torch.argmax(move_output, dim=1) # Shape (k_games,)
-
-        for i in range(k_games):
-            # Get the chosen move index for the current game (i)
-            #chosen_move_index = chosen_moves_indices[i].item()
-            stateid_record[i][step] = stateid[i].numpy()
-
-            move_np = move_output[i].numpy()
-            max_ind = np.argmax(move_np)
-            rand_move = np.random.rand(M_length)
-
-            if np.random.rand(M_length)[max_ind] < move_np[max_ind]: # some probability for a random move instead
-              # Apply the chosen move to the corresponding state
-              actions_record[i][step] = move_np
-              bunch_of_states[i].code_to_move1(move_np, N, change_max_degree, max_terms, max_degree)
-            else:
-              actions_record[i][step] = rand_move
-              bunch_of_states[i].code_to_move1(rand_move, N, change_max_degree, max_terms, max_degree)
-
-            # Update the state representation for the next turn
-
-            stateid[i] = bunch_of_states[i].get_data_torch(num_of_cond ,max_terms, no_coef)
-
-            # probably need to record the moves, as it is impossible to recover them from the final states
-    return bunch_of_states, actions_record, stateid_record
-
-
-def play_random_games(agent, k_games, start_state, num_of_cond, max_terms, no_coef, N, change_max_degree, max_degree): # to play random games
-    """
-    Play k_games starting at start_state, using the agent to give probability distributions on each move.
-    """
-    #bunch_of_states = [copy.deepcopy(start_state) for _ in range(k_games)] # Create k_games copies of the start_state
-    # Create a numpy array of k_games copies of the start_state
-    bunch_of_states = np.empty(k_games, dtype=object)
-    for i in range(k_games):
-        bunch_of_states[i] = copy.deepcopy(start_state)
-
-    stateid=(start_state.get_data_torch(num_of_cond ,max_terms, no_coef)).repeat(k_games,1)
-    moveid = torch.eye(n_turns)
-
-    actions_record = np.zeros((k_games, n_turns, M_length))
-    stateid_record = np.zeros((k_games, n_turns, S_length))
-
-    for step in range(n_turns):
-        # Determine the chosen move for each game in the batch
-        # We take the argmax along the M_length dimension (dimension 1)
-        #chosen_moves_indices = torch.argmax(move_output, dim=1) # Shape (k_games,)
-
-        for i in range(k_games):
-            # Get the chosen move index for the current game (i)
-            #chosen_move_index = chosen_moves_indices[i].item()
-            stateid_record[i][step] = stateid[i].numpy()
-
-            rand_move = np.random.rand(M_length)
-
-            actions_record[i][step] = rand_move
-            bunch_of_states[i].code_to_move1(rand_move, N, change_max_degree, max_terms, max_degree)
-
-            # Update the state representation for the next turn
-
-            stateid[i] = bunch_of_states[i].get_data_torch(num_of_cond ,max_terms, no_coef)
-
-            # probably need to record the moves, as it is impossible to recover them from the final states
-    return bunch_of_states, actions_record, stateid_record
-
-# Check that we can generate games from a model.
-# Pass the necessary arguments to play_games
-#games, actions, states = play_games(FCModel([100, 100]), 100, S, num_of_cond, max_terms, False, N, change_max_degree, max_degree)
-
-"""print(games[1])
-print((actions[1][1]).shape)
-print((states[1][1]).shape)
-ngames= states.shape
-ngames
-
-states.shape
-states_torch = torch.from_numpy(states)
-states_torch.shape
-states_torch = states_torch.flatten(end_dim=1)
-states_torch.shape[1]
-states.shape[1]
-
-# Reinforcing games
-"""
-
-def reinforce_games(
-    model,
-    optimiser,
-    #games,
-    np_states,
-    np_moves,
-    batch_size=100,
-):
-    """
-    Given a list of completed games, reinforce each move in each game.
-    """
-    #n_games, _ = games.shape
-    n_games = np_states.shape[0] #have to be equal to batch_size? actually, no. It is a batch we reinforcing
-    # so batch_size ideally need to divide n_games
-    n_turns = np_states.shape[1]
-    S = np_states.shape[2]
-    M = np_moves.shape[2]
-    #stateid = torch.zeros((n_games, n_turns, S_length))
-    #moveid = torch.eye(n_turns)
-
-    # Unpack the games into (state, move, actions).
-    # I don't think I need this stage as everything is already unpacked
-    #states = torch.zeros((n_games, n_nurns, S))
-    moveids = torch.zeros((n_games, n_turns, n_turns))
-    #actions = torch.zeros((n_games, n_turns, M))
-    for t in range(n_turns):
-        moveids[:, t, t] = 1
-        #states[:, t+1:, t] = torch.from_numpy(games[:, None, t])
-        #actions[:, t, 0] = torch.from_numpy(games[:, t])
-
-
-    # Reshape these so that we can shuffle the moves between games.
-    states = torch.from_numpy(np_states).float()
-    states = states.flatten(end_dim=1)
-    moveids = moveids.flatten(end_dim=1)
-    actions = torch.from_numpy(np_moves).float()
-    actions = actions.flatten(end_dim=1)
-
-    # Reinforce
-    criterion = nn.CrossEntropyLoss()
-    shuffle = torch.randperm(n_games * n_turns)
-    for i in range(0, n_games * n_turns, batch_size):
-        batch = shuffle[i:i+batch_size]
-
-        optimiser.zero_grad()
-        predicted = model(states[batch], moveids[batch])
-        loss = criterion(predicted, actions[batch])
-        loss.backward()
-        optimiser.step()
-
-
-# Check that this works.
-"""
-model = FCModel([100, 100])
-reinforce_games(
-    model=model,
-    optimiser=torch.optim.SGD(model.parameters(), lr=0.01),
-    np_states = states,
-    np_moves = actions,
-)
-"""
-
-K_GAMES = 350
-KEEP_TOP = K_GAMES//5
-
-model = ModelBU([50, 20, 20, 10])
-optimiser = torch.optim.SGD(model.parameters(), lr=0.01)
-
-r= 5
-n = r*(r+1)//2
-num_of_cond = 7
-max_terms = 16
-max_degree =6 # not needed for imput of the agent (state.data_for_torch())
-change_max_degree = 2 # maximum degree of a change of variables
-N = 8 # max lenght of state (number of ToyTorics is it)
-
-num_of_coef =2 #if over Z, only +- 1
-#num_of_coef = 32002 # if over finite field
-
-#  length of a torch tensor incoding a state (first input of agent)
-#S_length = N*(num_of_cond*(n+(n+1)*max_terms)) # if no_coef is False
-S_length = N*(num_of_cond*(n+(n)*max_terms)) # if no_coef is True
-
-n_turns =10 # number of turns we want to play (second imput of agent)
-
-# length of a torch tensor incoding a move (output of agent)
-#M_length = 1+N*(math.comb(n,2)+n*num_of_coef*(math.comb(n+change_max_degree,change_max_degree)-1))
-M_length = 1+N*(math.comb(n,2)) # for playing with blowups and auto changes of variables
-
-no_coef = True # no coefficients recorded in the data of the state
-
-
-# Defining the initial state for Fil4 -- ideals
-r = 5
-n = r*(r+1)//2
-gens = list(sp.symbols('x0:{}'.format(n)))
-integr = random_cc(5,6, 6, 4, None).integrand
-toytfil4 = ToyToric(integr, ccfil4, None, gens)
-S = ToyState(toytfil4,N) #Starting state
-
-print(S_length)
-print(M_length)
-
-# Initiating top games storage
-
-# Keep only the top so many games here.
-top_states = np.zeros((0, n_turns, S_length), dtype=np.float32)
-top_actions = np.zeros((0, n_turns, M_length), dtype=np.float32)
-
-# Initialize top_games as an empty numpy array of objects
-top_games = np.array([], dtype=object)
-
-# playing random games to fing good ones
-
-for i in range(20):
-    # Play some new games.
-    new_games, new_actions, new_states = play_random_games(model, K_GAMES, S, num_of_cond, max_terms, no_coef, N, change_max_degree, max_degree)
-
-    # Mix these games into our pot of the best games so far.
-    # Concatenate top_games (numpy array) and new_games (list, which np.concatenate handles)
-    all_games = np.concatenate([top_games, new_games], axis=0)
-    actions = np.concatenate([top_actions, new_actions], axis=0)
-    states = np.concatenate([top_states, new_states], axis=0)
-
-    # Score the games, and rearrange into descending order by score
-    scores = np.array([-game.weight() for game in all_games])
-    order = np.argsort(scores)[-KEEP_TOP:][::-1]
-    top_games = all_games[order] # top_games remains a numpy array
-    top_actions = actions[order]
-    top_states = states[order]
-
-    # Train
-    reinforce_games(model, optimiser, top_states, top_actions, batch_size=20)
-
-    # Display progress
-
-    #top_adj = board_to_adj(top_games[:10])
-    print(i,top_games[0].weight())
-    #print(f"Scores: {score_fn(top_adj).round(2)}")
-    #print(f"Num triangles: {count_triangles(top_adj).round(2)}")
-    #print(f"Num edges: {count_edges(top_adj)}")
-    #display_adj(board_to_adj(top_games[0]))
-
-game0 = top_games[0]
-print(S.weight())
-print(game0.weight())
-print(S)
-print(game0)
-
-# This cell can be re-run without resetting the model.
-
-# Keep only the top so many games here.
-#top_states = np.zeros((0, n_turns, S_length), dtype=np.float32)
-#top_actions = np.zeros((0, n_turns, M_length), dtype=np.float32)
-
-# Initialize top_games as an empty numpy array of objects
-#top_games = np.array([], dtype=object)
-
-
-for i in range(20):
-    # Play some new games.
-    new_games, new_actions, new_states = play_games(model, K_GAMES, S, num_of_cond, max_terms, no_coef, N, change_max_degree, max_degree)
-
-    # Mix these games into our pot of the best games so far.
-    # Concatenate top_games (numpy array) and new_games (list, which np.concatenate handles)
-    all_games = np.concatenate([top_games, new_games], axis=0)
-    actions = np.concatenate([top_actions, new_actions], axis=0)
-    states = np.concatenate([top_states, new_states], axis=0)
-
-    # Score the games, and rearrange into descending order by score
-    scores = np.array([-game.weight() for game in all_games])
-    order = np.argsort(scores)[-KEEP_TOP:][::-1]
-    top_games = all_games[order] # top_games remains a numpy array
-    top_actions = actions[order]
-    top_states = states[order]
-
-    # Train
-    reinforce_games(model, optimiser, top_states, top_actions, batch_size=20)
-
-    # Display progress
-
-    #top_adj = board_to_adj(top_games[:10])
-    print(i)
-    #print(f"Scores: {score_fn(top_adj).round(2)}")
-    #print(f"Num triangles: {count_triangles(top_adj).round(2)}")
-    #print(f"Num edges: {count_edges(top_adj)}")
-    #display_adj(board_to_adj(top_games[0]))
-
-game0 = top_games[0]
-print(S.weight())
-print(game0.weight())
-print(S)
-print(game0)
-
-top_actions[0]
-
-def move1_uncode(gens, code, N, deg, max_terms, max_deg, coef_pm=True):
-        # expects code to be 1-dimensional numpay array (with all but 1 zeroes, ideally. Still will work if its a probability destribution)
-        # here N is the maximal number of ToyTorics in the state, deg is maximal degree of change of variables
-        # max_deg is the maximum degree allowed in cone conditions
-        # max_terms is maximal number of terms in a polynomial in a cone condition
-        # coef_pm =True then only +1 and -1 are used as coefficients in the change of variables
-        #gens = self.variables
-        n = len(gens)
-        K = math.comb(n,2)
-        max_index = np.argmax(code)
-        if coef_pm:
-          num_coef=2
-        else:
-          num_coef= self.torics[0].ring.order-1 #excluding zero as a coeficient
-
-        if max_index > 1+N*(K+n*num_coef*(math.comb(n+deg,deg)-1)):
-          raise ValueError("Input is longer than expected.")
-        elif 1 <= max_index  <= N*K:
-          cc_ind = (max_index-1) //K
-          print("cc_ind:", cc_ind)
-
-
-          i= (max_index-1)%K
-          a = 0
-          # Find the smallest a such that i < comb(n - a, 2)
-          while i >= n - a - 1:
-              i -= n - a - 1
-              a += 1
-          b = a + 1 + i
-          print("blowup:", gens[a], "-", gens[b])
-            #self.blowup(cc_ind, self.torics[cc_ind].variables[a], self.torics[cc_ind].variables[b])
-            #return (self.torics[cc_ind].variables[a], self.torics[cc_ind].variables[b])
-
-        elif max_index  > N*K:
-          ind = max_index-N*K-1
-          cc_ind = ind // (n*num_coef*(math.comb(n+deg,deg)-1)) #index of the cone condition in the list
-          print("cc_ind:", cc_ind)
-
-
-          i= ind % (n*num_coef*(math.comb(n+deg,deg)-1))
-          #print("i:", i)
-          x_ind = i // (num_coef*(math.comb(n+deg,deg)-1)) # index of the variable we choose for the change
-          i =  i % (num_coef*(math.comb(n+deg,deg)-1))
-          #print("i:", i)
-          coef_ind =  i // (math.comb(n+deg,deg)-1) # index of a coeficient of the monomial
-          #print("coef_ind:", coef_ind)
-          if coef_pm:
-            coef= (-1)**coef_ind
-          else:
-            coef=(coef_ind+1)
-          #print("coef:", coef)
-          i = i % (math.comb(n+deg,deg)-1)
-          #print("i:", i)
-          mon = get_monomial_from_index(i, n, deg, gens)
-          #print("mon:", mon)
-          change = {gens[x_ind]:gens[x_ind]+ coef*mon}
-          print("cnahge:", change)
-
-for i in range(10):
-  print("move:", i)
-  move1_uncode(gens,top_actions[0][i],N, change_max_degree, max_terms, max_degree)
-  print("\n")
