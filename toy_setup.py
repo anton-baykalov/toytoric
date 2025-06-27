@@ -485,17 +485,17 @@ class ToyToric:
 
     def reduce(self):
         for index, (g, f) in enumerate(self.cone_conditions):
-            if sp.rem(f,g) == 0:
-                self.cone_conditions.remove((g, f))
-            else:
-                divisible_t = []
-                for t in f.as_expr().as_ordered_terms():
-                    t_poly = sp.Poly(t, *self.variables, domain=self.ring if self.ring else sp.ZZ)
-                    if sp.rem(t_poly,g) == 0:
-                        divisible_t.append(t_poly)
-                sum_t = sum(divisible_t)
-                #print(sum_t)
-                self.cone_conditions[index] = (g, (f - sum_t))
+            #if sp.rem(f,g) == 0:
+            #    self.cone_conditions.remove((g, f))
+            #else:
+            divisible_t = []
+            for t in f.as_expr().as_ordered_terms():
+                t_poly = sp.Poly(t, *self.variables, domain=self.ring if self.ring else sp.ZZ)
+                if sp.rem(t_poly,g) == 0:
+                    divisible_t.append(t_poly)
+            sum_t = sum(divisible_t)
+            #print(sum_t)
+            self.cone_conditions[index] = (g, (f - sum_t))
                 
 
 
@@ -1076,4 +1076,53 @@ len(S.torics[0].cone_conditions)
 
 #S.get_data_torch(6,6, False)
 
+"""
+
+# %% Example
+
+"""
+r = 6
+n = r*(r+1)//2
+
+gens = list(sp.symbols('x0:{}'.format(n)))
+
+# Define individual symbols for direct use in expressions
+for sym in gens:
+    globals()[sym.name] = sym
+
+cc614symbols = [(x18*x20, x9*x18 - x7*x19),
+ (x15*x18, x12*x15 - x11*x16),
+ (x11*x15, x7*x11 - x6*x12),
+ (x11*x15, x2*x11 - x1*x12),
+ (x15*x18*x20, x11*x17*x18 + x12*x15*x19 - x11*x16*x19),
+ (x15*x18*x20, x3*x15*x18 - x0*x17*x18 + x0*x16*x19),
+ (x11*x15*x18, x8*x11*x15 - x6*x13*x15 - x7*x11*x16 + x6*x12*x16),
+ (x11*x15*x18, x3*x11*x15 - x1*x13*x15 - x2*x11*x16 + x1*x12*x16),
+ (x11*x15*x18, x2*x11*x15 + x0*x13*x15 - x0*x12*x16),
+ (x11*x15*x18*x20,
+  x6*x14*x15*x18 + x7*x11*x17*x18 - x6*x12*x17*x18 + x8*x11*x15*x19 - x6*x13*x15*x19 - x7*x11*x16*x19 + x6*x12*x16*x19),
+ (x11*x15*x18*x20,
+  x1*x14*x15*x18 + x2*x11*x17*x18 - x1*x12*x17*x18 + x3*x11*x15*x19 - x1*x13*x15*x19 - x2*x11*x16*x19 + x1*x12*x16*x19),
+ (x11*x15*x18*x20,
+  x4*x11*x15*x18 + x0*x14*x15*x18 - x0*x12*x17*x18 - x2*x11*x15*x19 - x0*x13*x15*x19 + x0*x12*x16*x19),
+ (x20, x18),
+ (x20, x16),
+ (x18, x15),
+ (x18*x20, x15*x19),
+ (x20, x13),
+ (x20, x12),
+ (x15, x11),
+ (x20, x8),
+ (x18, x7),
+ (x11, x6),
+ (x20, x2),
+ (x11, x1),
+ (x11, x0),
+ (x11*x15, x0*x12),
+ (x15*x18, x0*x16)]
+
+cc614 = [(sp.Poly(p1, *gens, domain =sp.ZZ), sp.Poly(p2, *gens, domain=sp.ZZ) ) for p1, p2 in cc614symbols]
+
+integr = random_cc(6,6, 6, 4, None).integrand # this will create a standard integrand for the initial state
+toyt614 = ToyToric(integr, cc614, None, gens)
 """
