@@ -484,7 +484,7 @@ class ToyToric:
         return num_terms
 
     def reduce(self):
-        for (g, f) in self.cone_conditions:
+        for index, (g, f) in enumerate(self.cone_conditions):
             if sp.rem(f,g) == 0:
                 self.cone_conditions.remove((g, f))
             else:
@@ -495,8 +495,8 @@ class ToyToric:
                         divisible_t.append(t_poly)
                 sum_t = sum(divisible_t)
                 #print(sum_t)
-                self.cone_conditions.remove((g, f))
-                self.cone_conditions.append((g, (f - sum_t)))
+                self.cone_conditions[index] = (g, (f - sum_t))
+                
 
 
     #End of ToyToric class
