@@ -8,29 +8,13 @@ Created on Wed Sep  3 12:02:41 2025
 
 # %% imports
 
-import Zeta
-from stable_baselines3 import DQN
-import gymnasium as gym
-from torch import nn
-import torch
-import math
-import copy
-import random
-import IPython
-import sympy as sp
-import numpy as np
-import bisect
-from sage.all import *
-from Zeta import logger, smurf, surf, torus, toric, abstract, cycrat, triangulate, reps, subobjects, ask, cico, addmany
-from Zeta.convex import RationalSet
-from Zeta.ask import AskProcessor
-from Zeta.reps import RepresentationProcessor
-from Zeta.toric import ToricDatum
-from Zeta.convex import PositiveOrthant
 import inspect
-import sys
-sys.path.insert(1, '/home/anton/')
+import sys                                                                
+sys.path.insert(1, '/home/anton/')                                        
+import Zeta 
 
+from Zeta.convex import PositiveOrthant
+from Zeta.toric import ToricDatum
 
 class ToricDatumAlgebra:
     def __init__(self, T):
@@ -47,10 +31,33 @@ class ToricDatumAlgebra:
         return self
 
 
-# from Zeta.toric import ToricDatum
+
+from Zeta.reps import RepresentationProcessor
+from Zeta.ask import AskProcessor
+
+from Zeta.convex import RationalSet
+#from Zeta.toric import ToricDatum
+
+from Zeta import logger, smurf, surf, torus, toric, abstract, cycrat, triangulate, reps, subobjects, ask, cico, addmany
+
+from sage.all import *
+
+import bisect
+import numpy as np
+import sympy as sp
+import IPython
+import random
+import copy
+import math
+import torch
+from torch import nn
+
+# %% import for baselines 
+
+import gymnasium as gym
+from stable_baselines3 import DQN
 
 
-# %% import for baselines
 
 
 # %% random matrices from GL(n,Z)
