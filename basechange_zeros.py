@@ -58,12 +58,10 @@ import gymnasium as gym
 from stable_baselines3 import DQN
 
 
-
-
 # %% random matrices from GL(n,Z)
 
 
-def random_GL_nZ(n, num_ops=30, max_coeff=3):
+def random_GL_nZ(n, num_ops=10, max_coeff=3):
     """
     Generate a "random" invertible n x n integer matrix.
     - num_ops: number of random elementary operations
@@ -85,7 +83,10 @@ def random_GL_nZ(n, num_ops=30, max_coeff=3):
     return A
 
 
-# %% Gymnasium class for the change of basis
+def sign(x):
+    return 1 if x > 0 else -1 if x < 0 else 0
+
+# %% Gymnasium class for the change of basis 
 
 class AlgebraBasisEnv(gym.Env):
     """
@@ -93,10 +94,9 @@ class AlgebraBasisEnv(gym.Env):
     """
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, L, max_steps=10):
+    def __init__(self, L, max_steps=20):
         super().__init__()
         self.L = L  # Your Sage algebra object
-        #self.L_in = copy.deepcopy(L) # will not change
         self.n = L.rank  # dimension of algebra
         self.max_steps = max_steps
         self.current_step = 0
@@ -113,10 +113,9 @@ class AlgebraBasisEnv(gym.Env):
         )
 
         # keep integer transform matrix A
-        self.A = Matrix.identity(self.n)
-        #weight on previous turn to compute reward
-        self.pr_weight = L.toric_datum('subalgebras').weight()
-
+        #self.A = np.eye(self.n, dtype=int)
+        self.A = Matrix.identity(self.n) 
+        self.pr_zerocount = self._count_zeros(self._table_to_ndarray())
     # ---------- helpers ----------
     def _table_to_ndarray(self):
         """
@@ -126,24 +125,23 @@ class AlgebraBasisEnv(gym.Env):
         table = self.L.table  # assumed list-of-lists
         n = self.n
         arr = np.zeros((n, n, n), dtype=np.float64)
-
+    
         for i in range(n):
             for j in range(n):
                 v = table[i][j]
-
+    
                 # assume v is a vector-like object of length n (Sage vector)
                 try:
                     coords = list(v)
                 except Exception:
                     # if it's not directly listable, try converting via tuple()
                     coords = tuple(v)
-
+    
                 if len(coords) != n:
                     raise ValueError(
-                        f"Entry L.table[{i}][{j}] has length {
-                            len(coords)}, expected {n}"
+                        f"Entry L.table[{i}][{j}] has length {len(coords)}, expected {n}"
                     )
-
+    
                 # convert coordinates to floats (Sage rationals support float())
                 for k, c in enumerate(coords):
                     try:
@@ -160,7 +158,7 @@ class AlgebraBasisEnv(gym.Env):
     def _get_obs(self):
         arr = self._table_to_ndarray()
         return arr.flatten().astype(np.float32)
-
+    
     def _count_zeros(self, arr, tol=1e-9):
         "Count entries that are (close to) zero in a numpy array"
         return int(np.sum(np.isclose(arr, 0.0, atol=tol)))
@@ -170,9 +168,9 @@ class AlgebraBasisEnv(gym.Env):
         super().reset(seed=seed)
         self.current_step = 0
         self.L = self.L.change_basis(self.A.inverse())
-        self.A = Matrix.identity(self.n)  
+        self.A = Matrix.identity(self.n) 
+        self.pr_zerocount = self._count_zeros(self._table_to_ndarray())
         obs = self._get_obs()
-        self.pr_weight = L.toric_datum('subalgebras').weight()
         return obs, {}
 
     def step(self, action):
@@ -195,23 +193,22 @@ class AlgebraBasisEnv(gym.Env):
 
         # build numeric array and compute reward
         arr = self._table_to_ndarray()
-        #zero_count = self._count_zeros(arr)
-        #total_entries = arr.size
+        zero_count = self._count_zeros(arr)
+        total_entries = arr.size
 
-        #Getting corresponding toric datum to evaluate the reward
-        #tor_d = L.toric_datum('ideals')
-        tor_d = L.toric_datum('subalgebras')
-        toe_w = tor_d.weight()
         
-        reward = float(self.pr_weight - toe_w)
-        
-        self.pr_weight=toe_w
 
+        #reward = float(zero_count - self.pr_zerocount) #raw difference with previous state 
+        #reward = float(sign(zero_count - self.pr_zerocount)) # +-1 or 0
+        reward = float((zero_count - self.pr_zerocount)//5 +sign(zero_count - self.pr_zerocount)) # weighted reward but not too raw
+        self.pr_zerocount = zero_count
+        
         obs = arr.flatten().astype(np.float32)
         terminated = False  # unless you define a true "solved" condition
         truncated = self.current_step >= self.max_steps
         info = {
-            "weight": toe_w,
+            "zero_count": zero_count,
+            "total_scalar_entries": total_entries,
             "A": copy.deepcopy(self.A)
         }
         return obs, reward, terminated, truncated, info
@@ -224,17 +221,22 @@ class AlgebraBasisEnv(gym.Env):
 
 
 # %% Setting up the algebra (must be Zeta algebra)
-# L = Zeta.lookup('(ZZ^3,*)')
+#L = Zeta.lookup('(ZZ^3,*)')
 T = random_GL_nZ(5)
 print(T)
 L = Zeta.lookup('Fil4').change_basis(T)
 print(L)
-
+env = AlgebraBasisEnv(L)
+print(env._count_zeros(env._table_to_ndarray()))
 # %% creating environment and model
 env0 = AlgebraBasisEnv(Zeta.lookup('Fil4'))
-#env0._count_zeros(env0._table_to_ndarray())
+env0._count_zeros(env0._table_to_ndarray())
 env = AlgebraBasisEnv(L)
-model = DQN("MlpPolicy", env, verbose=1)
+model = DQN("MlpPolicy", env, verbose=1, learning_rate = 0.01, gamma=1.0, exploration_fraction=0.5,
+            exploration_final_eps=0.1)
+
+
+
 
 # %% printing out layers of the model
 '''
@@ -243,30 +245,33 @@ for name, module in model.policy.q_net.named_children():
 '''
 
 # %% custom model layers
-'''
+
 policy_kwargs = dict(
-    net_arch=[256, 256, 128]  # 3 hidden layers
+    net_arch=[256, 256, 256, 128]  # 3 hidden layers
 )
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1)
-'''
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, #gamma=1.0, 
+            exploration_fraction=0.3,
+            exploration_final_eps=0.05)
+
 
 # %% training!
-model.verbose = 1  # how much info prints during training 0,1 or 2
-model.learn(total_timesteps=4000)
+#model.verbose = 1 # how much info prints during training 0,1 or 2
+#model.exploration_initial_eps=0.1
+model.learn(total_timesteps=30000) 
 
 
-# %% analysing and trying the model
+# %% analysing and trying the model 
 
-# print("Last recorded loss:", model.replay_buffer.sample(batch_size=1))
-obs, _ = env.reset()  # reset the invironment to innitial state
+#print("Last recorded loss:", model.replay_buffer.sample(batch_size=1))  
+obs, _ = env.reset() #reset the invironment to innitial state
 
-# run the agent step by step
+# run the agent step by step 
 
 done = False
 while not done:
     # ask the model for an action
-    action, _states = model.predict(obs, deterministic=True)
+    action, _states = model.predict(obs, deterministic=False)
 
     # apply the action
     obs, reward, terminated, truncated, info = env.step(action)
@@ -281,10 +286,25 @@ print("Final basis matrix A:")
 print(env.A)
 
 print("Final multiplication table:")
-print(env.L.table)
+print(env.L.table) 
 
 print("Number of zeros:")
-env._count_zeros(env._table_to_ndarray())
+print(env._count_zeros(env._table_to_ndarray()))
 
-print("weight:")
-print(env.L.toric_datum('subalgebras').weight())
+# %% sucsessfull set up #1:
+    
+'''
+policy_kwargs = dict(
+    net_arch=[256, 256, 256, 128]  # 3 hidden layers
+)
+
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, #gamma=1.0, 
+            exploration_fraction=0.3,
+            exploration_final_eps=0.05)
+
+
+# %% training!
+#model.verbose = 1 # how much info prints during training 0,1 or 2
+#model.exploration_initial_eps=0.1
+model.learn(total_timesteps=30000) 
+'''
