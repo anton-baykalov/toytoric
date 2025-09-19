@@ -194,7 +194,7 @@ class AlgebraBasisEnv(gym.Env):
         
         # apply change of basis to L 
         self.L = L.change_basis(self.A)
-        print(self.A)
+        #print(self.A)
        
 
         #Getting corresponding toric datum to evaluate the reward
@@ -203,11 +203,11 @@ class AlgebraBasisEnv(gym.Env):
         tor_w = tor_d.weight()
         
         
-        print(tor_w)
-        print(self.pr_weight)
+        #print(tor_w)
+        #print(self.pr_weight)
         #reward = float(self.pr_weight - tor_w)
         reward = float((self.pr_weight - tor_w)/10 +sign(self.pr_weight - tor_w)) 
-        print(reward)
+        #print(reward)
         self.pr_weight=tor_w
 
         obs = self._get_obs()
@@ -264,7 +264,7 @@ model = DQN("MlpPolicy", env,  policy_kwargs=policy_kwargs, verbose=1, learning_
 
 # %% training!
 #model.verbose = 1  # how much info prints during training 0,1 or 2
-model.learn(total_timesteps=100)
+model.learn(total_timesteps=10000)
 
 
 # %% analysing and trying the model
