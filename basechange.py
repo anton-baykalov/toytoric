@@ -191,20 +191,23 @@ class AlgebraBasisEnv(gym.Env):
             self.A[i, :] *= -1
         elif t == 2 and i != j:
             self.A[i, :] += self.A[j, :]
-
+        
         # apply change of basis to L 
         self.L = L.change_basis(self.A)
-
+        print(self.A)
        
 
         #Getting corresponding toric datum to evaluate the reward
         #tor_d = L.toric_datum('ideals')
-        tor_d = L.toric_datum('subalgebras')
+        tor_d = self.L.toric_datum('subalgebras')
         tor_w = tor_d.weight()
         
-        #reward = float(self.pr_weight - tor_w)
-        reward = float((self.pr_weight - tor_w)//5 +sign(self.pr_weight - tor_w)) 
         
+        print(tor_w)
+        print(self.pr_weight)
+        #reward = float(self.pr_weight - tor_w)
+        reward = float((self.pr_weight - tor_w)/10 +sign(self.pr_weight - tor_w)) 
+        print(reward)
         self.pr_weight=tor_w
 
         obs = self._get_obs()
@@ -255,13 +258,13 @@ policy_kwargs = dict(
     net_arch=[256, 256, 256, 128]  # 3 hidden layers
 )
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, gamma=1.0, 
+model = DQN("MlpPolicy", env,  policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, gamma=1.0, 
             exploration_fraction=0.3,
             exploration_final_eps=0.05)
 
 # %% training!
-model.verbose = 1  # how much info prints during training 0,1 or 2
-model.learn(total_timesteps=10000)
+#model.verbose = 1  # how much info prints during training 0,1 or 2
+model.learn(total_timesteps=100)
 
 
 # %% analysing and trying the model
@@ -274,7 +277,7 @@ obs, _ = env.reset()  # reset the invironment to innitial state
 done = False
 while not done:
     # ask the model for an action
-    action, _states = model.predict(obs, deterministic=True)
+    action, _states = model.predict(obs, deterministic=False)
 
     # apply the action
     obs, reward, terminated, truncated, info = env.step(action)
@@ -291,8 +294,8 @@ print(env.A)
 print("Final multiplication table:")
 print(env.L.table)
 
-print("Number of zeros:")
-env._count_zeros(env._table_to_ndarray())
+#print("Number of zeros:")
+#env._count_zeros(env._table_to_ndarray())
 
 print("weight:")
 print(env.L.toric_datum('subalgebras').weight())
