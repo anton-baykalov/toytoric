@@ -107,7 +107,7 @@ class AlgebraBasisEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(3 * self.n * self.n)
 
         # observation will be the flattened (n,n,n) table of coordinates
-        obs_shape = (self.n * self.n * self.n,)
+        obs_shape = (self.n * self.n * self.n+1,)
         self.observation_space = gym.spaces.Box(
             low=-np.inf, high=np.inf, shape=obs_shape, dtype=np.float32
         )
@@ -157,7 +157,9 @@ class AlgebraBasisEnv(gym.Env):
 
     def _get_obs(self):
         arr = self._table_to_ndarray()
-        return arr.flatten().astype(np.float32)
+        return np.concatenate([
+            np.array([self.current_step], dtype=np.float32),
+            arr.flatten().astype(np.float32)])
     
     def _count_zeros(self, arr, tol=1e-9):
         "Count entries that are (close to) zero in a numpy array"
@@ -192,6 +194,7 @@ class AlgebraBasisEnv(gym.Env):
         self.L = L.change_basis(self.A)
 
         # build numeric array and compute reward
+        obs = self._get_obs()
         arr = self._table_to_ndarray()
         zero_count = self._count_zeros(arr)
         total_entries = arr.size
@@ -203,7 +206,7 @@ class AlgebraBasisEnv(gym.Env):
         reward = float((zero_count - self.pr_zerocount)//5 +sign(zero_count - self.pr_zerocount)) # weighted reward but not too raw
         self.pr_zerocount = zero_count
         
-        obs = arr.flatten().astype(np.float32)
+        
         terminated = False  # unless you define a true "solved" condition
         truncated = self.current_step >= self.max_steps
         info = {
@@ -250,8 +253,8 @@ policy_kwargs = dict(
     net_arch=[256, 256, 256, 128]  # 3 hidden layers
 )
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, #gamma=1.0, 
-            exploration_fraction=0.3,
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1, learning_rate = 0.0001, gamma=1.0, 
+            exploration_fraction=0.4,
             exploration_final_eps=0.05)
 
 
